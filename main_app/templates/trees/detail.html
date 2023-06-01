@@ -1,0 +1,153 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block head %}
+<link 
+  href="https://cdn.jsdelivr.net/npm/mc-datepicker/dist/mc-calendar.min.css" 
+  rel="stylesheet" 
+/>
+<link rel="stylesheet" href="{% static 'css/mcdp.css' %}">
+<script 
+  src="https://cdn.jsdelivr.net/npm/mc-datepicker/dist/mc-calendar.min.js"
+>
+</script>
+<link 
+  rel="stylesheet" 
+  type="text/css" 
+  href="{% static 'css/trees/tree-detail.css' %}"
+/>
+<script defer src="{% static 'js/tree-detail.js' %}"></script>
+{% endblock %}
+
+{% block content %}
+
+<section class="tree-container">
+  <div class="tree-img">
+    <img 
+      src="{% static 'images/sk8r-boi-tree.svg' %}" 
+      alt="A skater boy tree"
+    >
+  </div>
+  <div class="tree-details">
+    <h1>{{ tree.name }}</h1>
+    <h2>A member of the {{ tree.family }} family.</h2>
+    {% if tree.lifeSpan > 0 %}
+      <p>Typical lifespan: {{ tree.lifeSpan }} years</p>
+    {% else %}
+      <p>Lifespan varies or is unknown.</p>
+    {% endif %}
+    <p>{{ tree.description }}</p>
+    <div class="tree-actions">
+      <a href="{% url 'tree-update' tree.id %}" class="btn warn">Edit</a>
+      <a href="{% url 'tree-delete' tree.id %}" class="btn danger">Delete</a>
+    </div>
+  </div>
+</section>
+
+<div class="seasons-pref-container">
+  <section class="seasons">
+    <div class="subsection-title">
+      <h2>Seasons</h2>
+      <img 
+        src="{% static 'images/cat-cone.svg' %}" 
+        alt="An ice cream cone cat"
+      />
+      <img 
+        src="{% static 'images/cat-onigiri.svg' %}"
+        alt="A cat as onigiri"
+      />
+      <img 
+        src="{% static 'images/kitty-kabob.svg' %}" 
+        alt="A kabob of kittens"
+      />
+    </div>
+  </div>
+  <h3>Add a Season</h3>
+  <form
+    action="{% url 'add-season' tree.id %}"
+    method="post" 
+    class="subsection-content"
+  >
+  {% if cat.fed_for_today %}
+  <p class="fed">{{tree.name}} has been watered appropriatly  today!</p>
+  {% else %}
+    <p class="unfed">{{tree.name}} might be hungry!</p>
+  {% endif %}
+    {% csrf_token %}
+    {{ season_form.as_p }}
+    <button type="submit" class="btn submit">Add Season</button>
+  </form>
+  <h3>Past Seasons</h3>
+  {% if tree.season.all.count %}
+    <table>
+      <thead>
+        <tr><th>Date</th><th>Season</th></tr>
+      </thead>
+      <tbody>
+        {% for season in tree.season_set.all %}
+          <tr>
+            <td>{{season.date}}</td>
+            <td>{{season.get_season_display}}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+    <div class="subsection-content">
+      <p>{{tree.name}} has no favorite seasons 😔</p>
+    </div>
+    {% endif %}
+  </section>
+  <section class="prefs">
+    <div class="subsection-title">
+      <h2>Preferences:</h2>
+      <img src="{% static 'images/string.svg' %}" alt="A ball of string" />
+      <img src="{% static 'images/mouse.svg' %}" alt="A mouse" />
+      <img src="{% static 'images/fish.svg' %}" alt="A fishy toy" />
+    </div>
+    <h3>{{ tree.name }}'s Preferences</h3>
+    <div class="subsection-content">
+      {% if tree.prefs.count %}
+        {% for pref in tree.pref.all %}
+          <div class="pref-container">
+            <div 
+              class="color-block"
+              style="background-color: {{ pref.color }}"
+            ></div>
+            <a href="{% url 'pref-detail' pref.id %}">
+              <p>A {{ pref.color }} {{ pref.date }}</p>
+            </a>
+          </div>
+        {% endfor %}
+      {% else %}
+        <p class="no-prefs">{{tree.name}} doesn't have any preferences 😞</p>
+      {% endif %}
+    </div>
+    <h3>Available Preferences</h3>
+    <div class="subsection-content">
+      {% if prefs.count %}
+        {% for pref in prefs.all %}
+          <div class="pref-container">
+            <div 
+              class="color-block"
+              style="background-color: {{ pref.color }}"
+            ></div>
+            <a href="{% url 'pref-detail' pref.id %}">
+              <p>A {{ pref.color }} {{ pref.date }}</p>
+            </a>
+            <form action="{% url 'assoc-pref' tree.id pref.id %}" method="post">
+              {% csrf_token %}
+              <button type="submit" class="btn submit">Give preference</button>
+            </form>
+          </div>
+        {% endfor %}
+      {% else %}
+        <p class="all-prefs">
+          {{tree.name}} already has all the available preferences 🥳
+        </p>
+      {% endif %}
+    </div>
+  </section>
+</div>
+
+{% endblock %}

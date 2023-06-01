@@ -1,0 +1,24 @@
+{% extends 'base.html' %} 
+{% load static %} 
+
+{% block head %}
+<link
+  rel="stylesheet"
+  type="text/css"
+  href="{% static 'css/prefs/pref-detail.css' %}"
+/>
+{% endblock %}
+
+{% block content %}
+  
+<div class="card" style="border-color: {{ pref.color }}">
+  <div class="card-bg" style="background-color: {{ pref.color }}"></div>
+  <div class="card-content">
+    <h2>{{ pref.date }}</h2>
+    <p>A {{ pref.color }} preference</p>
+  </div>
+</div>
+<a href="{% url 'pref-update' pref.id %}" class="btn warn">Edit</a>
+<a href="{% url 'pref-delete' pref.id %}" class="btn danger">Delete</a>
+
+{% endblock %}
