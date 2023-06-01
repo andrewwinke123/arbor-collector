@@ -46,7 +46,7 @@ def about(request):
     return render(request, 'about.html')
 
 def arbor_index(request):
-  trees = Tree.objects.all()
+  trees = Tree.objects.filter(user=request.user)
   return render(request, 'trees/index.html', { 'trees': trees })
 
 def arbor_detail(request, tree_id):
